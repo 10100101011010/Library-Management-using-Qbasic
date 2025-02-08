@@ -1,0 +1,584 @@
+DECLARE SUB OpenInput (Data$(), i)
+
+DECLARE SUB TampilData (Data$(), j)
+
+DECLARE SUB InputData (Data$(), j)
+
+DIM Data$(100, 6)
+
+CLS
+
+DO
+    CLS
+    PRINT CHR$(201) + STRING$(78, CHR$(205)) + CHR$(187) ' Top border
+    PRINT CHR$(186) + "                                  MAIN MENU                                   " + CHR$(186) ' Title row
+    PRINT CHR$(204) + STRING$(78, CHR$(205)) + CHR$(185) ' Separator
+    PRINT CHR$(186) + "                                                                              " + CHR$(186) ' Blank row
+    PRINT CHR$(186) + "  1. Tampilkan Data                      4. Hapus Data                        " + CHR$(186)
+    PRINT CHR$(186) + "                                                                              " + CHR$(186) ' Blank row
+    PRINT CHR$(186) + "  2. Tambah Data                         5. Rekap Data                        " + CHR$(186)
+    PRINT CHR$(186) + "                                                                              " + CHR$(186) ' Blank row
+    PRINT CHR$(186) + "  3. Ubah Data                           6. Keluar                            " + CHR$(186)
+    PRINT CHR$(186) + "                                                                              " + CHR$(186) ' Blank row
+    PRINT CHR$(200) + STRING$(78, CHR$(205)) + CHR$(188) ' Bottom border
+    PRINT
+    INPUT "  Pilih menu (1-6): ", Pilihan$
+    PRINT
+
+    SELECT CASE Pilihan$
+    CASE "1"  ' Tampilkan Data
+        DO
+            CLS
+            PRINT CHR$(201) + STRING$(78, CHR$(205)) + CHR$(187) ' Top border
+            PRINT CHR$(186) + "                                TAMPILKAN DATA                                " + CHR$(186) ' Title row
+            PRINT CHR$(204) + STRING$(78, CHR$(205)) + CHR$(185) ' Separator
+            PRINT CHR$(186) + "                                                                              " + CHR$(186) ' Blank row
+            PRINT CHR$(186) + "  1. Satu Per Satu                      3. Kembali Ke Menu                    " + CHR$(186)
+            PRINT CHR$(186) + "                                                                              " + CHR$(186) ' Blank row
+            PRINT CHR$(186) + "  2. Semua                                                                    " + CHR$(186)
+            PRINT CHR$(186) + "                                                                              " + CHR$(186) ' Blank row
+            PRINT CHR$(200) + STRING$(78, CHR$(205)) + CHR$(188) ' Bottom border
+            PRINT
+            INPUT "  Pilih tampilan data (1-3): ", SubPilihan$
+            PRINT
+
+            SELECT CASE SubPilihan$
+            CASE "1"  ' Satu Per Satu
+                DO
+
+                    CALL OpenInput(Data$(), i)
+
+                    CLS
+                    PRINT CHR$(201) + STRING$(78, CHR$(205)) + CHR$(187) ' Top border
+                    PRINT CHR$(186) + "                                SATU PER SATU                                 " + CHR$(186) ' Title row
+                    PRINT CHR$(200) + STRING$(78, CHR$(205)) + CHR$(188) ' Bottom border
+                    PRINT
+                    INPUT "Masukkan kode atau judul buku yang ingin ditampilkan : ", Target$
+                    Found = 0
+
+                    FOR j = 1 TO i
+                        IF UCASE$(Data$(j, 1)) = UCASE$(Target$) OR UCASE$(Data$(j, 2)) = UCASE$(Target$) THEN
+                            Found = 1
+                            CLS
+
+                            CALL TampilData(Data$(), j)
+
+                            LOCATE 23, 1: PRINT "Tekan tombol apa saja untuk melanjutkan."
+                            WHILE INKEY$ = "": WEND
+                            EXIT FOR
+                        END IF
+                    NEXT
+
+                    IF Found = 0 THEN
+                        CLS
+                        PRINT "Data tidak ditemukan untuk : "; Target$
+                        LOCATE 23, 1: PRINT "Tekan tombol apa saja untuk melanjutkan."
+                        WHILE INKEY$ = "": WEND
+                    END IF
+
+                    DO
+                        CLS
+                        INPUT "Tampilkan Data lain? (Y/N): ", Lanjut$
+                        Lanjut$ = UCASE$(Lanjut$)
+                        IF Lanjut$ = "Y" OR Lanjut$ = "N" THEN EXIT DO
+                        PRINT
+                        PRINT "Masukkan Y untuk Ya, atau N untuk Tidak."
+                        SLEEP
+                    LOOP
+
+                    IF Lanjut$ = "N" THEN EXIT DO
+                LOOP
+
+            CASE "2"  ' Semua Data
+                CurrentPage = 1
+                RecordsPerPage = 8
+
+                CALL OpenInput(Data$(), i)
+                NumRecords = i
+
+                IF NumRecords = 0 THEN
+                    PRINT "Tidak ada data untuk ditampilkan."
+                    LOCATE 23, 1: PRINT "Tekan tombol apa saja untuk melanjutkan."
+                    WHILE INKEY$ = "": WEND
+                    EXIT DO
+                END IF
+
+                DO
+                    CLS
+                    PRINT "DAFTAR PINJAMAN BUKU - HALAMAN "; CurrentPage; " DARI "; INT((NumRecords - 1) / RecordsPerPage) + 1
+                    PRINT CHR$(201) + STRING$(6, CHR$(205)) + CHR$(203) + STRING$(16, CHR$(205)) + CHR$(203) + STRING$(15, CHR$(205)) + CHR$(203) + STRING$(15, CHR$(205)) + CHR$(203) + STRING$(12, CHR$(205)) + CHR$(203) + STRING$(9, CHR$(205)) + CHR$(187)' Top border
+                    PRINT CHR$(186) + " KODE " + CHR$(186) + " JUDUL          " + CHR$(186) + " PENULIS       " + CHR$(186) + " PENERBIT      " + CHR$(186) + " TANGGAL    " + CHR$(186) + " JENIS   " + CHR$(186)'Title row
+                    PRINT CHR$(204) + STRING$(6, CHR$(205)) + CHR$(206) + STRING$(16, CHR$(205)) + CHR$(206) + STRING$(15, CHR$(205)) + CHR$(206) + STRING$(15, CHR$(205)) + CHR$(206) + STRING$(12, CHR$(205)) + CHR$(206) + STRING$(9, CHR$(205)) + CHR$(185)' Separator
+
+                    StartIndex = (CurrentPage - 1) * RecordsPerPage + 1
+                    EndIndex = CurrentPage * RecordsPerPage
+
+                    IF EndIndex > NumRecords THEN EndIndex = NumRecords
+
+                    FOR i = StartIndex TO EndIndex
+                        IF i = EndIndex THEN
+                            Item$ = CHR$(186) + " \   \" + CHR$(186) + " \            \ " + CHR$(186) + " \           \ " + CHR$(186) + " \           \ " + CHR$(186) + " \        \ " + CHR$(186) + " \     \ " + CHR$(186)
+                        ELSE
+                            Item$ = CHR$(186) + " \   \" + CHR$(186) + " \            \ " + CHR$(186) + " \           \ " + CHR$(186) + " \           \ " + CHR$(186) + " \        \ " + CHR$(186) + " \     \ " + CHR$(186) + CHR$(186) + SPACE$(6) + CHR$(186) + SPACE$(16) + CHR$(186) + SPACE$(15) + CHR$(186) + SPACE$(15) + CHR$(186) + SPACE$(12) + CHR$(186) + SPACE$(9) + CHR$(186)
+                        END IF
+                        PRINT USING Item$; Data$(i, 1); Data$(i, 2); Data$(i, 3); Data$(i, 4); Data$(i, 5); Data$(i, 6)
+                    NEXT i
+
+                    PRINT CHR$(200) + STRING$(6, CHR$(205)) + CHR$(202) + STRING$(16, CHR$(205)) + CHR$(202) + STRING$(15, CHR$(205)) + CHR$(202) + STRING$(15, CHR$(205)) + CHR$(202) + STRING$(12, CHR$(205)) + CHR$(202) + STRING$(9, CHR$(205)) + CHR$(188)' Bottom Border
+
+                    PRINT "N: Next Page  P: Previous Page  Q: Quit"
+                    INPUT "Pilih navigasi: ", Nav$
+                    Nav$ = UCASE$(Nav$)
+
+                    SELECT CASE Nav$
+                    CASE "N"
+                        IF CurrentPage < INT((NumRecords - 1) / RecordsPerPage) + 1 THEN
+                            CurrentPage = CurrentPage + 1
+                        ELSE
+                            PRINT "Ini adalah halaman terakhir."
+                            SLEEP
+                        END IF
+                    CASE "P"
+                        IF CurrentPage > 1 THEN
+                            CurrentPage = CurrentPage - 1
+                        ELSE
+                            PRINT "Ini adalah halaman pertama."
+                            SLEEP
+                        END IF
+                    CASE "Q"
+                        EXIT DO
+                    CASE ELSE
+                        PRINT "Pilihan tidak valid. Coba lagi."
+                        SLEEP
+                    END SELECT
+                LOOP
+                LOCATE 23, 1: PRINT "Tekan tombol apa saja untuk melanjutkan."
+                WHILE INKEY$ = "": WEND
+
+            CASE "3"  ' Kembali Ke Menu
+                EXIT DO
+
+            CASE ELSE
+                PRINT "Pilihan tidak valid. Coba lagi."
+                SLEEP
+            END SELECT
+        LOOP
+
+    CASE "2"  ' Tambah Data
+        OPEN "C:\DATA\PINJAM.DAT" FOR APPEND AS #1
+        OPEN "C:\DATA\KODEUNIK.DAT" FOR INPUT AS #2
+        INPUT #2, LastKode
+        CLOSE #2
+
+        DO
+            Data$(j, 1) = RIGHT$("000" + LTRIM$(STR$(LastKode)), 3)
+
+            CALL InputData(Data$(), j)
+
+            DO
+                CLS
+
+                CALL TampilData(Data$(), j)
+
+                INPUT "Data akan ditambah, anda yakin? (Y/N): ", Confirm$
+                PRINT
+                Confirm$ = UCASE$(Confirm$)
+                IF Confirm$ = "Y" THEN
+                    LastKode = LastKode + 1
+                    WRITE #1, Data$(j, 1), Data$(j, 2), Data$(j, 3), Data$(j, 4), Data$(j, 5), Data$(j, 6)
+                    PRINT "Data berhasil ditambahkan!"
+                    LOCATE 23, 1: PRINT "Tekan tombol apa saja untuk melanjutkan."
+                    WHILE INKEY$ = "": WEND
+                    EXIT DO
+                ELSEIF Confirm$ = "N" THEN
+                    PRINT "Penambahan dibatalkan."
+                    LOCATE 23, 1: PRINT "Tekan tombol apa saja untuk melanjutkan."
+                    WHILE INKEY$ = "": WEND
+                    EXIT DO
+                ELSE
+                    PRINT "Masukkan Y untuk Ya, atau N untuk Tidak."
+                    SLEEP
+                END IF
+            LOOP
+
+            DO
+                CLS
+                INPUT "Apakah ingin tambah data lain? (Y/N): ", Lanjut$
+                Lanjut$ = UCASE$(Lanjut$)
+                IF Lanjut$ = "Y" OR Lanjut$ = "N" THEN EXIT DO
+                PRINT
+                PRINT "Masukkan Y untuk Ya, atau N untuk Tidak."
+                SLEEP
+            LOOP
+
+            OPEN "C:\DATA\KODEUNIK.DAT" FOR OUTPUT AS #2
+                WRITE #2, LastKode
+                CLOSE #2
+
+            IF Lanjut$ = "N" THEN EXIT DO
+        LOOP
+        CLOSE #1
+
+    CASE "3"  ' Ubah Data
+        DO
+
+            CALL OpenInput(Data$(), i)
+
+            CLS
+            PRINT CHR$(201) + STRING$(78, CHR$(205)) + CHR$(187) ' Top border
+            PRINT CHR$(186) + "                                  UBAH DATA                                   " + CHR$(186) ' Title row
+            PRINT CHR$(200) + STRING$(78, CHR$(205)) + CHR$(188) ' Bottom border
+            PRINT
+            INPUT "Masukkan judul atau kode buku yang ingin diubah: ", Target$
+            Found = 0
+
+            FOR j = 1 TO i
+                IF UCASE$(Data$(j, 1)) = UCASE$(Target$) OR UCASE$(Data$(j, 2)) = UCASE$(Target$) THEN
+                    Found = 1
+                    DO
+                        CLS
+
+                        CALL TampilData(Data$(), j)
+
+                        INPUT "Apakah ini data yang ingin diubah? (Y/N): ", ConfirmData$
+                        PRINT
+                        ConfirmData$ = UCASE$(ConfirmData$)
+                        IF ConfirmData$ = "Y" THEN
+                            EXIT DO
+                        ELSEIF ConfirmData$ = "N" THEN
+                            EXIT FOR
+                        ELSE
+                            PRINT "Masukkan Y untuk Ya, atau N untuk Tidak."
+                            SLEEP
+                        END IF
+                    LOOP
+
+                    CALL InputData(Data$(), j)
+
+                    DO
+                        CLS
+
+                        CALL TampilData(Data$(), j)
+
+                        INPUT "Data akan diubah, anda yakin? (Y/N): ", Confirm$
+                        PRINT
+                        Confirm$ = UCASE$(Confirm$)
+                        IF Confirm$ = "Y" THEN
+                            OPEN "C:\DATA\PINJAM.DAT" FOR OUTPUT AS #1
+                            FOR k = 1 TO i
+                                WRITE #1, Data$(k, 1), Data$(k, 2), Data$(k, 3), Data$(k, 4), Data$(k, 5), Data$(k, 6)
+                            NEXT
+                            CLOSE
+                            PRINT "Data berhasil diubah!"
+                            LOCATE 23, 1: PRINT "Tekan tombol apa saja untuk melanjutkan."
+                            WHILE INKEY$ = "": WEND
+                            EXIT DO
+                        ELSEIF Confirm$ = "N" THEN
+                            PRINT "Perubahan dibatalkan."
+                            LOCATE 23, 1: PRINT "Tekan tombol apa saja untuk melanjutkan."
+                            WHILE INKEY$ = "": WEND
+                            EXIT DO
+                        ELSE
+                            PRINT "Masukkan Y untuk Ya, atau N untuk Tidak."
+                            SLEEP
+                        END IF
+                    LOOP
+                    EXIT FOR
+                END IF
+            NEXT
+
+            IF Found = 0 THEN
+                CLS
+                PRINT "Data tidak ditemukan untuk: "; Target$
+                LOCATE 23, 1: PRINT "Tekan tombol apa saja untuk melanjutkan."
+                WHILE INKEY$ = "": WEND
+            END IF
+
+            DO
+                CLS
+                INPUT "Apakah ingin ubah data lain? (Y/N): ", Lanjut$
+                Lanjut$ = UCASE$(Lanjut$)
+                IF Lanjut$ = "Y" OR Lanjut$ = "N" THEN EXIT DO
+                PRINT
+                PRINT "Masukkan Y untuk Ya, atau N untuk Tidak."
+                SLEEP
+            LOOP
+
+            IF Lanjut$ = "N" THEN EXIT DO
+        LOOP
+
+    CASE "4"  ' Hapus Data
+        DO
+
+            CALL OpenInput(Data$(), i)
+
+            CLS
+            PRINT CHR$(201) + STRING$(78, CHR$(205)) + CHR$(187) ' Top border
+            PRINT CHR$(186) + "                                  HAPUS DATA                                  " + CHR$(186) ' Title row
+            PRINT CHR$(200) + STRING$(78, CHR$(205)) + CHR$(188) ' Bottom border
+            PRINT
+            INPUT "Masukkan kode atau judul buku yang ingin dihapus: ", Target$
+            Found = 0
+
+            FOR j = 1 TO i
+                IF UCASE$(Data$(j, 1)) = UCASE$(Target$) OR UCASE$(Data$(j, 2)) = UCASE$(Target$) THEN
+                    Found = 1
+
+                    DO
+                        CLS
+
+                        CALL TampilData(Data$(), j)
+
+                        INPUT "Data akan dihapus, anda yakin? (Y/N): ", Confirm$
+                        PRINT
+                        Confirm$ = UCASE$(Confirm$)
+                        IF Confirm$ = "Y" THEN
+                            PRINT "Data berhasil dihapus!"
+                            LOCATE 23, 1: PRINT "Tekan tombol apa saja untuk melanjutkan."
+                            WHILE INKEY$ = "": WEND
+                            EXIT DO
+                        ELSEIF Confirm$ = "N" THEN
+                            PRINT "Penghapusan dibatalkan."
+                            LOCATE 23, 1: PRINT "Tekan tombol apa saja untuk melanjutkan."
+                            WHILE INKEY$ = "": WEND
+                            EXIT DO
+                        ELSE
+                            PRINT "Masukkan Y untuk Ya, atau N untuk Tidak."
+                            SLEEP
+                        END IF
+                    LOOP
+                    EXIT FOR
+                END IF
+            NEXT
+
+            IF Found = 0 THEN
+                CLS
+                PRINT "Data tidak ditemukan untuk: "; Target$
+                LOCATE 23, 1: PRINT "Tekan tombol apa saja untuk melanjutkan."
+                WHILE INKEY$ = "": WEND
+            ELSEIF Found = 1 AND Confirm$ = "Y" THEN
+                OPEN "C:\DATA\PINJAM.DAT" FOR OUTPUT AS #1
+                FOR k = 1 TO i
+                    IF k <> j THEN
+                        WRITE #1, Data$(k, 1), Data$(k, 2), Data$(k, 3), Data$(k, 4), Data$(k, 5), Data$(k, 6)
+                    END IF
+                NEXT
+                CLOSE
+            END IF
+
+            DO
+                CLS
+                INPUT "Apakah ingin hapus data lain? (Y/N): ", Lanjut$
+                Lanjut$ = UCASE$(Lanjut$)
+                IF Lanjut$ = "Y" OR Lanjut$ = "N" THEN EXIT DO
+                PRINT
+                PRINT "Masukkan Y untuk Ya, atau N untuk Tidak."
+                SLEEP
+            LOOP
+
+            IF Lanjut$ = "N" THEN EXIT DO
+        LOOP
+
+    CASE "5"  ' Rekap Data
+        CLS
+        PRINT CHR$(201) + STRING$(78, CHR$(205)) + CHR$(187) ' Top border
+        PRINT CHR$(186) + "                                  REKAP DATA                                  " + CHR$(186) ' Title row
+        PRINT CHR$(204) + STRING$(78, CHR$(205)) + CHR$(185) ' Separator
+
+        TotalOnline = 0
+        TotalOffline = 0
+
+        CALL OpenInput(Data$(), i)
+
+        FOR j = 1 TO i
+            IF Data$(j, 6) = "ONLINE" THEN
+                TotalOnline = TotalOnline + 1
+            ELSEIF Data$(j, 6) = "OFFLINE" THEN
+                TotalOffline = TotalOffline + 1
+            END IF
+        NEXT
+
+        NumRecords$ = LTRIM$(STR$(i))
+        TotalOnline$ = LTRIM$(STR$(TotalOnline))
+        TotalOffline$ = LTRIM$(STR$(TotalOffline))
+
+        PRINT CHR$(186) + " Total Data          : "; NumRecords$ + SPACE$(55 - LEN(NumRecords$)); CHR$(186)
+        PRINT CHR$(186) + " Total Data Online   : "; TotalOnline$ + SPACE$(55 - LEN(TotalOnline$)); CHR$(186)
+        PRINT CHR$(186) + " Total Data Offline  : "; TotalOffline$ + SPACE$(55 - LEN(TotalOffline$)); CHR$(186)
+        PRINT CHR$(200) + STRING$(78, CHR$(205)) + CHR$(188) ' Bottom border
+        PRINT
+        LOCATE 23, 1: PRINT "Tekan tombol apa saja untuk melanjutkan."
+        WHILE INKEY$ = "": WEND
+
+    CASE "6"  ' Keluar
+        PRINT "Terima kasih telah menggunakan program."
+        END
+
+    CASE ELSE
+        PRINT "Pilihan tidak valid. Coba lagi."
+        SLEEP
+    END SELECT
+LOOP
+
+SUB InputData (Data$(), j)
+
+                DO
+                    CLS
+                    LOCATE 1, 1: PRINT "INPUT DATA BARU"
+                    LOCATE 2, 1: PRINT CHR$(201) + STRING$(78, CHR$(205)) + CHR$(187) ' Top border
+                    LOCATE 3, 1: PRINT CHR$(186) + "                                  DATA BUKU                                   " + CHR$(186)
+                    LOCATE 4, 1: PRINT CHR$(204) + STRING$(78, CHR$(205)) + CHR$(185) ' Separator
+                    LOCATE 5, 1: PRINT CHR$(186) + " Kode Buku                          : "; Data$(j, 1) + SPACE$(40 - LEN(Data$(j, 1))); CHR$(186)
+                    LOCATE 6, 1: PRINT CHR$(186) + " Judul Buku                         :                                         " + CHR$(186)
+                    LOCATE 7, 1: PRINT CHR$(186) + " Nama Penulis                       :                                         " + CHR$(186)
+                    LOCATE 8, 1: PRINT CHR$(186) + " Nama Penerbit                      :                                         " + CHR$(186)
+                    LOCATE 9, 1: PRINT CHR$(186) + " Tanggal Terbit (Hari-Bulan-Tahun)  :                                         " + CHR$(186)
+                    LOCATE 10, 1: PRINT CHR$(186) + " Jenis (ONLINE/OFFLINE)             :                                         " + CHR$(186)
+                    LOCATE 11, 1: PRINT CHR$(200) + STRING$(78, CHR$(205)) + CHR$(188) ' Bottom border
+                    LOCATE 6, 39: INPUT " ", Data$(j, 2)
+
+                    IF LEN(Data$(j, 2)) > 0 THEN EXIT DO
+                        LOCATE 13, 1: PRINT "Judul buku tidak boleh kosong!"
+                        SLEEP
+                LOOP UNTIL LEN(Data$(j, 2)) > 0
+
+                DO
+                    CLS
+                    LOCATE 1, 1: PRINT "INPUT DATA BARU"
+                    LOCATE 2, 1: PRINT CHR$(201) + STRING$(78, CHR$(205)) + CHR$(187) ' Top border
+                    LOCATE 3, 1: PRINT CHR$(186) + "                                  DATA BUKU                                   " + CHR$(186)
+                    LOCATE 4, 1: PRINT CHR$(204) + STRING$(78, CHR$(205)) + CHR$(185) ' Separator
+                    LOCATE 5, 1: PRINT CHR$(186) + " Kode Buku                          : "; Data$(j, 1) + SPACE$(40 - LEN(Data$(j, 1))); CHR$(186)
+                    LOCATE 6, 1: PRINT CHR$(186) + " Judul Buku                         : "; Data$(j, 2) + SPACE$(40 - LEN(Data$(j, 2))); CHR$(186)
+                    LOCATE 7, 1: PRINT CHR$(186) + " Nama Penulis                       :                                         " + CHR$(186)
+                    LOCATE 8, 1: PRINT CHR$(186) + " Nama Penerbit                      :                                         " + CHR$(186)
+                    LOCATE 9, 1: PRINT CHR$(186) + " Tanggal Terbit (Hari-Bulan-Tahun)  :                                         " + CHR$(186)
+                    LOCATE 10, 1: PRINT CHR$(186) + " Jenis (ONLINE/OFFLINE)             :                                         " + CHR$(186)
+                    LOCATE 11, 1: PRINT CHR$(200) + STRING$(78, CHR$(205)) + CHR$(188) ' Bottom border
+                    LOCATE 7, 39: INPUT " ", Data$(j, 3)
+
+                    IF LEN(Data$(j, 3)) > 0 THEN EXIT DO
+                        LOCATE 13, 1: PRINT "Nama penulis tidak boleh kosong!"
+                        SLEEP
+                LOOP UNTIL LEN(Data$(j, 3)) > 0
+
+
+
+                DO
+                    CLS
+                    LOCATE 1, 1: PRINT "INPUT DATA BARU"
+                    LOCATE 2, 1: PRINT CHR$(201) + STRING$(78, CHR$(205)) + CHR$(187) ' Top border
+                    LOCATE 3, 1: PRINT CHR$(186) + "                                  DATA BUKU                                   " + CHR$(186)
+                    LOCATE 4, 1: PRINT CHR$(204) + STRING$(78, CHR$(205)) + CHR$(185) ' Separator
+                    LOCATE 5, 1: PRINT CHR$(186) + " Kode Buku                          : "; Data$(j, 1) + SPACE$(40 - LEN(Data$(j, 1))); CHR$(186)
+                    LOCATE 6, 1: PRINT CHR$(186) + " Judul Buku                         : "; Data$(j, 2) + SPACE$(40 - LEN(Data$(j, 2))); CHR$(186)
+                    LOCATE 7, 1: PRINT CHR$(186) + " Nama Penulis                       : "; Data$(j, 3) + SPACE$(40 - LEN(Data$(j, 3))); CHR$(186)
+                    LOCATE 8, 1: PRINT CHR$(186) + " Nama Penerbit                      :                                         " + CHR$(186)
+                    LOCATE 9, 1: PRINT CHR$(186) + " Tanggal Terbit (Hari-Bulan-Tahun)  :                                         " + CHR$(186)
+                    LOCATE 10, 1: PRINT CHR$(186) + " Jenis (ONLINE/OFFLINE)             :                                         " + CHR$(186)
+                    LOCATE 11, 1: PRINT CHR$(200) + STRING$(78, CHR$(205)) + CHR$(188) ' Bottom border
+                    LOCATE 8, 39: INPUT " ", Data$(j, 4)
+
+                    IF LEN(Data$(j, 4)) > 0 THEN EXIT DO
+                        LOCATE 13, 1: PRINT "Nama Penerbit tidak boleh kosong!"
+                        SLEEP
+                LOOP UNTIL LEN(Data$(j, 4)) > 0
+
+                DO
+
+                    CLS
+                    LOCATE 1, 1: PRINT "INPUT DATA BARU"
+                    LOCATE 2, 1: PRINT CHR$(201) + STRING$(78, CHR$(205)) + CHR$(187) ' Top border
+                    LOCATE 3, 1: PRINT CHR$(186) + "                                  DATA BUKU                                   " + CHR$(186)
+                    LOCATE 4, 1: PRINT CHR$(204) + STRING$(78, CHR$(205)) + CHR$(185) ' Separator
+                    LOCATE 5, 1: PRINT CHR$(186) + " Kode Buku                          : "; Data$(j, 1) + SPACE$(40 - LEN(Data$(j, 1))); CHR$(186)
+                    LOCATE 6, 1: PRINT CHR$(186) + " Judul Buku                         : "; Data$(j, 2) + SPACE$(40 - LEN(Data$(j, 2))); CHR$(186)
+                    LOCATE 7, 1: PRINT CHR$(186) + " Nama Penulis                       : "; Data$(j, 3) + SPACE$(40 - LEN(Data$(j, 3))); CHR$(186)
+                    LOCATE 8, 1: PRINT CHR$(186) + " Nama Penerbit                      : "; Data$(j, 4) + SPACE$(40 - LEN(Data$(j, 4))); CHR$(186)
+                    LOCATE 9, 1: PRINT CHR$(186) + " Tanggal Terbit (Hari-Bulan-Tahun)  :                                         " + CHR$(186)
+                    LOCATE 10, 1: PRINT CHR$(186) + " Jenis (ONLINE/OFFLINE)             :                                         " + CHR$(186)
+                    LOCATE 11, 1: PRINT CHR$(200) + STRING$(78, CHR$(205)) + CHR$(188) ' Bottom border
+                    LOCATE 9, 39: INPUT " ", Data$(j, 5)
+
+    
+                    IF LEN(Data$(j, 5)) = 10 AND MID$(Data$(j, 5), 3, 1) = "-" AND MID$(Data$(j, 5), 6, 1) = "-" THEN
+                        Hari = VAL(LEFT$(Data$(j, 5), 2))
+                        Bulan = VAL(MID$(Data$(j, 5), 4, 2))
+                        Tahun = VAL(RIGHT$(Data$(j, 5), 4))
+                    ELSEIF LEN(Data$(j, 5)) = 9 AND MID$(Data$(j, 5), 2, 1) = "-" AND MID$(Data$(j, 5), 5, 1) = "-" THEN
+                        Hari = VAL(LEFT$(Data$(j, 5), 1))
+                        Bulan = VAL(MID$(Data$(j, 5), 3, 2))
+                        Tahun = VAL(RIGHT$(Data$(j, 5), 4))
+                    ELSEIF LEN(Data$(j, 5)) = 9 AND MID$(Data$(j, 5), 3, 1) = "-" AND MID$(Data$(j, 5), 5, 1) = "-" THEN
+                        Hari = VAL(LEFT$(Data$(j, 5), 2))
+                        Bulan = VAL(MID$(Data$(j, 5), 4, 1))
+                        Tahun = VAL(RIGHT$(Data$(j, 5), 4))
+                    ELSEIF LEN(Data$(j, 5)) = 8 AND MID$(Data$(j, 5), 2, 1) = "-" AND MID$(Data$(j, 5), 4, 1) = "-" THEN
+                        Hari = VAL(LEFT$(Data$(j, 5), 1))
+                        Bulan = VAL(MID$(Data$(j, 5), 3, 1))
+                        Tahun = VAL(RIGHT$(Data$(j, 5), 4))
+                    END IF
+
+                    IF Hari >= 1 AND Hari <= 31 AND Bulan >= 1 AND Bulan <= 12 THEN
+                        Hari$ = RIGHT$("0" + LTRIM$(STR$(Hari)), 2)
+                        Bulan$ = RIGHT$("0" + LTRIM$(STR$(Bulan)), 2)
+                        Tahun$ = LTRIM$(STR$(Tahun))
+
+                        Data$(j, 5) = Hari$ + "-" + Bulan$ + "-" + Tahun$
+                        EXIT DO
+                    ELSE
+                    LOCATE 13, 1: PRINT "Input atau format salah! Contoh: 05-06-2024"
+                    SLEEP
+                    END IF
+                LOOP UNTIL Data$(j, 5) = Hari$ + "-" + Bulan$ + "-" + Tahun$
+
+                DO
+                    CLS
+                    LOCATE 1, 1: PRINT "INPUT DATA BARU"
+                    LOCATE 2, 1: PRINT CHR$(201) + STRING$(78, CHR$(205)) + CHR$(187) ' Top border
+                    LOCATE 3, 1: PRINT CHR$(186) + "                                  DATA BUKU                                   " + CHR$(186)
+                    LOCATE 4, 1: PRINT CHR$(204) + STRING$(78, CHR$(205)) + CHR$(185) ' Separator
+                    LOCATE 5, 1: PRINT CHR$(186) + " Kode Buku                          : "; Data$(j, 1) + SPACE$(40 - LEN(Data$(j, 1))); CHR$(186)
+                    LOCATE 6, 1: PRINT CHR$(186) + " Judul Buku                         : "; Data$(j, 2) + SPACE$(40 - LEN(Data$(j, 2))); CHR$(186)
+                    LOCATE 7, 1: PRINT CHR$(186) + " Nama Penulis                       : "; Data$(j, 3) + SPACE$(40 - LEN(Data$(j, 3))); CHR$(186)
+                    LOCATE 8, 1: PRINT CHR$(186) + " Nama Penerbit                      : "; Data$(j, 4) + SPACE$(40 - LEN(Data$(j, 4))); CHR$(186)
+                    LOCATE 9, 1: PRINT CHR$(186) + " Tanggal Terbit (Hari-Bulan-Tahun)  : "; Data$(j, 5) + SPACE$(40 - LEN(Data$(j, 5))); CHR$(186)
+                    LOCATE 10, 1: PRINT CHR$(186) + " Jenis (ONLINE/OFFLINE)             :                                         " + CHR$(186)
+                    LOCATE 11, 1: PRINT CHR$(200) + STRING$(78, CHR$(205)) + CHR$(188) ' Bottom border
+                    LOCATE 10, 39: INPUT " ", Data$(j, 6)
+
+                    Data$(j, 6) = UCASE$(Data$(j, 6))
+                    IF Data$(j, 6) = "ONLINE" OR Data$(j, 6) = "OFFLINE" THEN EXIT DO
+                        LOCATE 13, 1: PRINT "Masukkan Online atau Offline saja!"
+                        SLEEP
+                LOOP UNTIL Data$(j, 6) = "ONLINE" OR Data$(j, 6) = "OFFLINE"
+
+END SUB
+
+SUB OpenInput (Data$(), i)
+
+    OPEN "C:\DATA\PINJAM.DAT" FOR INPUT AS #1
+    i = 0
+    DO UNTIL EOF(1)
+        i = i + 1
+        INPUT #1, Data$(i, 1), Data$(i, 2), Data$(i, 3), Data$(i, 4), Data$(i, 5), Data$(i, 6)
+    LOOP
+    CLOSE
+
+END SUB
+
+SUB TampilData (Data$(), j)
+
+    PRINT CHR$(201) + STRING$(78, CHR$(205)) + CHR$(187) ' Top border
+    PRINT CHR$(186) + "                                  DATA BUKU                                   " + CHR$(186)
+    PRINT CHR$(204) + STRING$(78, CHR$(205)) + CHR$(185) ' Separator
+    PRINT CHR$(186) + " Kode Buku      : "; Data$(j, 1) + SPACE$(60 - LEN(Data$(j, 1))); CHR$(186)
+    PRINT CHR$(186) + " Judul Buku     : "; Data$(j, 2) + SPACE$(60 - LEN(Data$(j, 2))); CHR$(186)
+    PRINT CHR$(186) + " Nama Penulis   : "; Data$(j, 3) + SPACE$(60 - LEN(Data$(j, 3))); CHR$(186)
+    PRINT CHR$(186) + " Nama Penerbit  : "; Data$(j, 4) + SPACE$(60 - LEN(Data$(j, 4))); CHR$(186)
+    PRINT CHR$(186) + " Tanggal Terbit : "; Data$(j, 5) + SPACE$(60 - LEN(Data$(j, 5))); CHR$(186)
+    PRINT CHR$(186) + " Jenis          : "; Data$(j, 6) + SPACE$(60 - LEN(Data$(j, 6))); CHR$(186)
+    PRINT CHR$(200) + STRING$(78, CHR$(205)) + CHR$(188) ' Bottom border
+    PRINT
+
+END SUB
