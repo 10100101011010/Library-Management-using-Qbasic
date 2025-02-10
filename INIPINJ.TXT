@@ -1,0 +1,28 @@
+
+OPEN "C:\DATA\PINJAM.DAT" FOR OUTPUT AS #1
+WRITE #1, "001", "The Shadows", "Jacqueline West", "Penguin Young Readers Group", "14-06-2011", "OFFLINE"
+WRITE #1, "002", "Harry Potter and the Philosopher's Stone", "J.K. Rowling", "Bloomsbury", "26-06-1997", "ONLINE"
+WRITE #1, "003", "The Great Gatsby", "F. Scott Fitzgerald", "Charles Scribner's Sons", "10-04-1925", "OFFLINE"
+WRITE #1, "004", "To Kill a Mockingbird", "Harper Lee", "J.B. Lippincott & Co.", "11-07-1960", "ONLINE"
+WRITE #1, "005", "1984", "George Orwell", "Secker & Warburg", "08-06-1949", "OFFLINE"
+WRITE #1, "006", "The Catcher in the Rye", "J.D. Salinger", "Little, Brown and Company", "16-07-1951", "ONLINE"
+WRITE #1, "007", "Pride and Prejudice", "Jane Austen", "T. Egerton", "28-01-1813", "OFFLINE"
+WRITE #1, "008", "The Hobbit", "J.R.R. Tolkien", "George Allen & Unwin", "21-09-1937", "ONLINE"
+WRITE #1, "009", "The Book Thief", "Markus Zusak", "Knopf Books for Young Readers", "14-03-2006", "OFFLINE"
+WRITE #1, "010", "The Alchemist", "Paulo Coelho", "HarperCollins", "01-04-1988", "ONLINE"
+WRITE #1, "011", "The Kite Runner", "Khaled Hosseini", "Riverhead Books", "29-05-2003", "OFFLINE"
+WRITE #1, "012", "Animal Farm", "George Orwell", "Secker & Warburg", "17-08-1945", "ONLINE"
+WRITE #1, "013", "The Fault in Our Stars", "John Green", "Dutton Books", "10-01-2012", "OFFLINE"
+WRITE #1, "014", "Jane Eyre", "Charlotte Brontë", "Smith, Elder & Co.", "16-10-1847", "ONLINE"
+WRITE #1, "015", "The Hunger Games", "Suzanne Collins", "Scholastic Press", "14-09-2008", "OFFLINE"
+WRITE #1, "016", "Divergent", "Veronica Roth", "Katherine Tegen Books", "25-04-2011", "ONLINE"
+CLOSE #1
+
+OPEN "C:\DATA\KODEUNIK.DAT" FOR OUTPUT AS #1
+WRITE #1, 17  ' Starting code, e.g., 100
+CLOSE
+PRINT "KODETRACKER.DAT initialized."
+
+
+
+
